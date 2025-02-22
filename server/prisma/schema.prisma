@@ -29,6 +29,28 @@ model Workout {
   description String?
   userId      Int
   user        User     @relation(fields: [userId], references: [id])
+  exercises    Exercise[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Exercise {
+  id        Int      @id @default(autoincrement())
+  title     String
+  workoutId Int      // Foreign key for Workout
+  workout   Workout  @relation(fields: [workoutId], references: [id])
+  sets      Set[]    // One exercise can have many sets
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Set {
+  id         Int      @id @default(autoincrement())
+  weight     Float    
+  reps       Int
+  completed  Boolean
+  exerciseId Int      // Foreign key for Exercise
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
