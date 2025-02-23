@@ -2,6 +2,7 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import workoutsRoutes from './routes/wokouts.routes';
+import userRoutes from './routes/users.routes'
 import prisma from './lib/prisma';
 dotenv.config();
 
@@ -39,6 +40,7 @@ app.get('/health', (req: Request, res: Response) => {
  });
 // Routes
 app.use('/workouts', workoutsRoutes);
+app.use('/users', userRoutes)
 
 // Start server
 app.listen(port, () => {
