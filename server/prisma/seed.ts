@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
+import bcrypt from 'bcrypt';
 
 // Helper types
 type ExerciseCreate = {
@@ -147,10 +148,14 @@ async function main() {
   await prisma.workout.deleteMany({})
   await prisma.user.deleteMany({})
 
+  const salt = await bcrypt.genSalt(10);
+  const defaultPassword = await bcrypt.hash('DefaultPass123', salt);
+
   // Create workouts with dates spanning the last week
   const user = await prisma.user.create({
     data: {
       email: 'test@example.com',
+      password: defaultPassword,
       name: 'Test User',
       workouts: {
         create: [
