@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
+  id        String    @id @default(uuid())
   email     String    @unique
   password  String
   name      String?
@@ -18,10 +18,10 @@ model User {
 }
 
 model Workout {
-  id          Int        @id @default(autoincrement())
+  id        String    @id @default(uuid())
   title       String
   description String?
-  userId      Int
+  userId    String
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   exercises   Exercise[]
@@ -29,9 +29,9 @@ model Workout {
 }
 
 model Exercise {
-  id        Int      @id @default(autoincrement())
+  id        String    @id @default(uuid())
   title     String
-  workoutId Int
+  workoutId String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   workout   Workout  @relation(fields: [workoutId], references: [id])
@@ -39,11 +39,11 @@ model Exercise {
 }
 
 model Set {
-  id         Int      @id @default(autoincrement())
+  id         String   @id @default(uuid())
   weight     Float
   reps       Int
   completed  Boolean
-  exerciseId Int
+  exerciseId String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   exercise   Exercise @relation(fields: [exerciseId], references: [id])

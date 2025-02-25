@@ -77,7 +77,6 @@ export const deleteUser = async (req: Request, res: Response) => {
     }
 
     // Delete all related data (or you could use cascading deletes in Prisma schema)
-    // This is necessary if you have constraints between tables
     await prisma.set.deleteMany({
       where: {
         exercise: {
@@ -119,7 +118,7 @@ export const deleteUser = async (req: Request, res: Response) => {
 };
 
 // Generate JWT
-const generateToken = (id: number) => {
+const generateToken = (id: string) => {
   return jwt.sign({ id }, JWT_SECRET, {
     expiresIn: '30d',
   });

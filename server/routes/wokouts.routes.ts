@@ -33,7 +33,7 @@ router.get('/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
   const workouts = await prisma.workout.findMany({
     where: {
-      id: Number(id),
+      id: id,
     },
     include: {
       exercises: {
@@ -73,7 +73,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
   const result = await prisma.workout.delete({
     where: {
-      id: Number(id),
+      id: id,
     },
   });
 
