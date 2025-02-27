@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
-import { error } from 'console';
 
+//get workouts
 export const getWorkouts = async (
   req: Request,
   res: Response
@@ -34,6 +34,7 @@ export const getWorkouts = async (
   }
 };
 
+//get workout
 export const getWorkout = async (
   req: Request,
   res: Response
@@ -72,6 +73,7 @@ export const getWorkout = async (
   }
 };
 
+//create workout
 export const createWorkout = async (
   req: Request,
   res: Response
@@ -104,11 +106,13 @@ export const createWorkout = async (
   }
 };
 
+//update workout
 export const updateeWorkout = async (
   req: Request,
   res: Response
 ): Promise<void> => {};
 
+//delete workout
 export const deleteWorkout = async (
   req: Request,
   res: Response
