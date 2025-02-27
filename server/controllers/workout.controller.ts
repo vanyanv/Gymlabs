@@ -20,7 +20,7 @@ export const getWorkouts = async (
       },
     });
 
-    if (!workouts) {
+    if (workouts.length === 0) {
       res.status(404).json({ error: 'No workouts found' });
     } else {
       console.log('Got workouts', workouts);
@@ -46,7 +46,7 @@ export const getWorkout = async (
       res.status(400).json({ error: 'No Workout Id' });
       return;
     }
-    const workouts = await prisma.workout.findMany({
+    const workouts = await prisma.workout.findUnique({
       where: {
         id: id,
       },
@@ -60,9 +60,9 @@ export const getWorkout = async (
     });
 
     if (!workouts) {
-      res.status(404).json({ error: 'No workouts found' });
+      res.status(404).json({ error: 'No workout found' });
     } else {
-      console.log('Got workouts', workouts);
+      console.log('Got workout', workouts);
       res.status(200).json(workouts);
     }
   } catch (error) {
@@ -106,12 +106,6 @@ export const createWorkout = async (
   }
 };
 
-//update workout
-export const updateeWorkout = async (
-  req: Request,
-  res: Response
-): Promise<void> => {};
-
 //delete workout
 export const deleteWorkout = async (
   req: Request,
@@ -125,13 +119,25 @@ export const deleteWorkout = async (
       return;
     }
 
+    const existingWorkout = await prisma.workout.findUnique({
+      where: {
+        id: id,
+        userId: req.user.id,
+      },
+    });
+
+    if (!existingWorkout) {
+      res.status(404).json({ error: 'Workout not found or unauthorized' });
+      return;
+    }
+
     const result = await prisma.workout.delete({
       where: {
         id: id,
       },
     });
 
-    res.status(200).json(result);
+    res.status(200).json({ message: 'Workout deleted successfully' });
   } catch (error) {
     console.log('Error in Delete Workout Controller');
     res.status(500).json({
