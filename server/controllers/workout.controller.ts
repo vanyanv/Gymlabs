@@ -21,7 +21,8 @@ export const getWorkouts = async (
     });
 
     if (workouts.length === 0) {
-      res.status(404).json({ error: 'No workouts found' });
+      //return an empty array if no workouts found
+      res.status(200).json([]);
     } else {
       console.log('Got workouts', workouts);
       res.status(200).json(workouts);
@@ -49,6 +50,7 @@ export const getWorkout = async (
     const workout = await prisma.workout.findUnique({
       where: {
         id: id,
+        userId: req.user.id,
       },
       include: {
         exercises: {
@@ -60,7 +62,8 @@ export const getWorkout = async (
     });
 
     if (!workout) {
-      res.status(200).json([]);
+      //return an error if we did not a find the workout
+      res.status(404).json({ error: 'Workout not found' });
     } else {
       console.log('Got workout', workout);
       res.status(200).json(workout);
@@ -127,7 +130,7 @@ export const deleteWorkout = async (
     });
 
     if (!existingWorkout) {
-      res.status(404).json({ error: 'Workout not found or unauthorized' });
+      res.status(404).json({ error: 'Workout not found' });
       return;
     }
 
