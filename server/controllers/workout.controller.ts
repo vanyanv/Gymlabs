@@ -27,7 +27,7 @@ export const getWorkouts = async (
       res.status(200).json(workouts);
     }
   } catch (error) {
-    console.log('Error in Get Workouts Controller');
+    console.error('Error in Get Workouts Controller:', error);
     res.status(500).json({
       error: 'Failed to get workouts',
     });
@@ -46,7 +46,7 @@ export const getWorkout = async (
       res.status(400).json({ error: 'No Workout Id' });
       return;
     }
-    const workouts = await prisma.workout.findUnique({
+    const workout = await prisma.workout.findUnique({
       where: {
         id: id,
       },
@@ -59,14 +59,14 @@ export const getWorkout = async (
       },
     });
 
-    if (!workouts) {
-      res.status(404).json({ error: 'No workout found' });
+    if (!workout) {
+      res.status(200).json([]);
     } else {
-      console.log('Got workout', workouts);
-      res.status(200).json(workouts);
+      console.log('Got workout', workout);
+      res.status(200).json(workout);
     }
   } catch (error) {
-    console.log('Error in Get Workout Controller');
+    console.log('Error in Get Workout Controller', error);
     res.status(500).json({
       error: 'Failed to get workout',
     });
@@ -99,7 +99,7 @@ export const createWorkout = async (
       .status(201)
       .json({ message: 'Workout created successfully', workout: result });
   } catch (error) {
-    console.log('Error in Create Workout Controller');
+    console.log('Error in Create Workout Controller', error);
     res.status(500).json({
       error: 'Failed to create workout',
     });
@@ -137,11 +137,13 @@ export const deleteWorkout = async (
       },
     });
 
-    res.status(200).json({ message: 'Workout deleted successfully' });
+    res
+      .status(200)
+      .json({ message: 'Workout deleted successfully', workout: result });
   } catch (error) {
-    console.log('Error in Delete Workout Controller');
+    console.log('Error in Delete Workout Controller', error);
     res.status(500).json({
-      error: 'Failed to Delete Workout',
+      error: 'Failed to delete workout',
     });
   }
 };
