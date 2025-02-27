@@ -7,14 +7,23 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your secret here';
 
 //registering a new user
 
-export const registerUser = async (req: Request, res: Response) => {
+export const registerUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password } = req.body as {
+      name: string;
+      email: string;
+      password: string;
+    };
 
+    console.log(name, email, password);
     if (!name || !email || !password) {
-      return res
+      res
         .status(400)
         .json({ error: 'Please Provide and Email, Password and Name' });
+      return;
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -34,12 +43,12 @@ export const registerUser = async (req: Request, res: Response) => {
       token: generateToken(user.id),
     });
   } catch (error) {
-    console.log('Error in Resister User Controller', error);
+    console.log('Error in Register User Controller', error);
     res.status(500).json({ error: 'Server Error' });
   }
 };
 
-export const loginUser = async (req: Request, res: Response) => {
+export const loginUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
 
@@ -49,7 +58,8 @@ export const loginUser = async (req: Request, res: Response) => {
     });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      res.status(401).json({ error: 'Invalid credentials' });
+      return;
     }
 
     res.status(200).json({
@@ -57,23 +67,26 @@ export const loginUser = async (req: Request, res: Response) => {
       name: user.name,
       token: generateToken(user.id),
     });
+    console.log('User Logged IN');
   } catch (error) {
     console.log('Error in Login Controller', error);
     res.status(500).json({ error: 'Server error' });
   }
 };
 
-export const deleteUser = async (req: Request, res: Response) => {
+export const deleteUser = async (
+  req: Request,
+  res: Response
+): Promise<void | Response> => {
   try {
-    //delete user
-
     // Check if user exists
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },
     });
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      res.status(404).json({ error: 'User not found' });
+      return;
     }
 
     // Delete all related data (or you could use cascading deletes in Prisma schema)
