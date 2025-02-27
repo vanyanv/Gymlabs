@@ -137,6 +137,7 @@ export const deleteWorkout = async (
     const result = await prisma.workout.delete({
       where: {
         id: id,
+        userId: req.user.id,
       },
     });
 
