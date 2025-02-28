@@ -8,13 +8,15 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
+  id        String     @id @default(uuid())
+  email     String     @unique
   password  String
   name      String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   workouts  Workout[]
+  exercises Exercise[]
+  sets      Set[]
 }
 
 model Workout {
@@ -25,16 +27,18 @@ model Workout {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   exercises   Exercise[]
-  user        User       @relation(fields: [userId], references: [id])
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Exercise {
   id        String   @id @default(uuid())
   title     String
   workoutId String
+  userId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  workout   Workout  @relation(fields: [workoutId], references: [id])
+  workout   Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   sets      Set[]
 }
 
@@ -44,7 +48,9 @@ model Set {
   reps       Int
   completed  Boolean
   exerciseId String
+  userId     String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
