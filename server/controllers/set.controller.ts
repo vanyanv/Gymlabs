@@ -105,10 +105,6 @@ export const deleteSet = async (req: Request, res: Response): Promise<void> => {
       },
     });
 
-    if (!result) {
-      res.status(400).json({ error: 'Could not delete Set' });
-    }
-
     res.status(200).json({ message: 'deleted set' });
   } catch (error) {
     console.log('Error or Delete Set Controller', error);
