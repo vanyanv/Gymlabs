@@ -38,10 +38,11 @@ export const getSet = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const set = await prisma.set.findUnique({
+    const set = await prisma.set.findFirst({
       where: {
         id,
         exerciseId,
+        userId: req.user.id,
       },
     });
 

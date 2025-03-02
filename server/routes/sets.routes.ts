@@ -1,16 +1,22 @@
 import { Router } from 'express';
 import { protect } from '../middleware/auth';
+import {
+  addSet,
+  deleteSet,
+  getSet,
+  getSets,
+} from '../controllers/set.controller';
 
 const router = Router();
 
 router.use(protect);
 
-router.get('/');
+router.get('/', getSets);
 
-router.get('/:id');
+router.get('/exerciseId/:id', getSet);
 
-router.post('/');
+router.post('/:exerciseId/:id', addSet);
 
-router.delete('/:id');
+router.delete('/:id', deleteSet);
 
 export default router;
