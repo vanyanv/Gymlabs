@@ -278,7 +278,7 @@ async function main() {
           sets: {
             create: exercise.sets.map((set) => ({
               ...set,
-              weight: set.weight + 5, // Progressive overload!,
+              weight: set.weight + 5,
               user: {
                 connect: { id: user.id },
               },

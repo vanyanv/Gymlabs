@@ -123,7 +123,7 @@ export const deleteUser = async (
 
     res.json({ message: 'User deleted successfully' });
 
-    res.status(200).json('User Deleted');
+    res.status(200).json({ message: 'User Deleted' });
   } catch (error) {
     console.log('Error in Delete User Controller', Error);
     res.status(500).json({ error: 'Server Error' });
