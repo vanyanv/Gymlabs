@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
-import { error } from 'console';
 
 export const getSets = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -47,7 +46,7 @@ export const getSet = async (req: Request, res: Response): Promise<void> => {
     });
 
     if (!set) {
-      res.status(400).json({ error: 'No set Found' });
+      res.status(404).json({ error: 'No set Found' });
       return;
     }
     console.log('Got Set', set);
@@ -63,7 +62,7 @@ export const addSet = async (req: Request, res: Response): Promise<void> => {
     const { weight, reps, completed } = req.body;
     const { exerciseId } = req.params;
 
-    if (!weight || !reps || !completed) {
+    if (!weight == null || !reps == null || !completed == null) {
       res.status(400).json({ error: 'Please enter weight, reps' });
       return;
     }
@@ -98,7 +97,21 @@ export const deleteSet = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const result = await prisma.set.delete({
+    const existingSet = prisma.set.findFirst({
+      where: {
+        id,
+        userId: req.user.id,
+      },
+    });
+
+    if (!existingSet) {
+      res.status(404).json({
+        error: 'Set not found or not authorized',
+      });
+      return;
+    }
+
+    await prisma.set.delete({
       where: {
         id,
         userId: req.user.id,
