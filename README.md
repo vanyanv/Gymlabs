@@ -2,7 +2,7 @@
 
 ![GymLabs Logo](https://your-image-url.com/logo.png)
 
-## Progressive Workout Tracking for Serious Athletes
+## Progressive Workout Tracking
 
 GymLabs is a premium fitness tracking application designed with Apple's design philosophy in mind, helping serious gym-goers track their workouts, visualize progress, and achieve consistent progressive overload.
 
