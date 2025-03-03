@@ -15,6 +15,8 @@ class WgerApiService {
   private accessToken: string | null;
   private refreshToken: string | null;
   private isAuthenticating: boolean;
+  private refreshAttempts: number = 0;
+  private maxRefreshAttempts: number = 4;
 
   constructor() {
     this.baseURL = 'https://wger.de/api/v2';
@@ -131,6 +133,16 @@ class WgerApiService {
     // Prevent recursive calls
     if (this.isAuthenticating) return;
 
+    // Check if we've exceeded retry attempts
+    if (this.refreshAttempts >= this.maxRefreshAttempts) {
+      console.error('Maximum token refresh attempts exceeded');
+      // Reset the counter after some time to allow future attempts
+      setTimeout(() => {
+        this.refreshAttempts = 0;
+      }, 30 * 60 * 1000); // Reset after 30 minutes, adjust as needed
+      return;
+    }
+
     if (!this.refreshToken) {
       // If no refresh token, try initial authentication
       await this.initializeAuthentication();
@@ -138,7 +150,6 @@ class WgerApiService {
     }
 
     this.isAuthenticating = true;
-
     try {
       const response = await fetch(`${this.baseURL}/token/refresh/`, {
         method: 'POST',
@@ -151,6 +162,9 @@ class WgerApiService {
       });
 
       if (!response.ok) {
+        // Increment attempt counter
+        this.refreshAttempts++;
+
         // If refresh fails, try full authentication
         const username = process.env.WGER_USERNAME;
         const password = process.env.WGER_PASSWORD;
@@ -165,12 +179,18 @@ class WgerApiService {
         return;
       }
 
+      // Success - reset attempt counter
+      this.refreshAttempts = 0;
+
       const data = (await response.json()) as { access: string };
       this.accessToken = data.access;
     } catch (error) {
       console.error('Error refreshing token:', error);
       this.accessToken = null;
       this.refreshToken = null;
+
+      // Increment attempt counter on errors as well
+      this.refreshAttempts++;
     } finally {
       this.isAuthenticating = false;
     }

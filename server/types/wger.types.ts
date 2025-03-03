@@ -19,7 +19,7 @@ export interface Exercise {
 export interface ExerciseNameInfo {
   id: number;
   name: string;
-  category: string;
+  category: string; // String representation of the category name for simplified use cases
 }
 
 export interface PaginatedResponse<T> {

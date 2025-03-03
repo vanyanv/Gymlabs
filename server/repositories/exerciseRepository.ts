@@ -26,13 +26,24 @@ class ExerciseRepository {
       return cachedExerciseNames;
     }
 
-    // Fetch from API if not in cache
-    const exerciseNames = await wgerApiService.getExerciseNames(language);
+    try {
+      // Fetch from API if not in cache
+      const exerciseNames = await wgerApiService.getExerciseNames(language);
 
-    // Save to cache
-    this.cache.set(cacheKey, exerciseNames);
+      // Save to cache
+      this.cache.set(cacheKey, exerciseNames);
 
-    return exerciseNames;
+      return exerciseNames;
+
+    } catch (error) {
+      console.error(
+        `Failed to fetch exercise names: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`
+      );
+      //returning a empty array
+      return []
+    }
   }
 
   // Method to manually invalidate cache
