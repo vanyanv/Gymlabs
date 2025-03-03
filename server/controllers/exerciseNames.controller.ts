@@ -24,13 +24,13 @@ export const getExerciseName = async (
 ): Promise<void> => {
   try {
     const { name } = req.body;
-    console.log(name);
-    //get rid of all white
-    const searchName = name.trim().toLowerCase();
+
     if (!name) {
       res.status(400).json({ error: 'No Name, Please enter an exercise name' });
       return;
     }
+
+    const searchName = name.trim().toLowerCase();
 
     // Get language from query param or default to English (2)
     const language = parseInt(req.query.language as string) || 2;
