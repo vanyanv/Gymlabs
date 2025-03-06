@@ -6,7 +6,7 @@ import tokenStorage from './tokenStorage';
 import { QueryClient } from '@tanstack/react-query';
 
 // Define API base URL - adjust this to your actual API URL
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3009';
 
 // Define a queryClient for direct usage within the store
 const queryClient = new QueryClient();
@@ -50,7 +50,7 @@ export const useAuthStore = create<AuthState>()(
           if (token) {
             // Manually fetch user data using JWT token
             // Note: You need to implement a /api/users/me endpoint in your backend
-            const response = await fetch(`${API_URL}/api/users/me`, {
+            const response = await fetch(`${API_URL}/api/auth/me`, {
               headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ export const useAuthStore = create<AuthState>()(
         const headers = new Headers();
         headers.append('Content-Type', 'application/json');
 
-        const response = await fetch(`${API_URL}/api/users/login`, {
+        const response = await fetch(`${API_URL}/api/auth/login`, {
           method: 'POST',
           headers,
           body: JSON.stringify({ email, password }),
@@ -114,7 +114,7 @@ export const useAuthStore = create<AuthState>()(
         const headers = new Headers();
         headers.append('Content-Type', 'application/json');
 
-        const response = await fetch(`${API_URL}/api/users/register`, {
+        const response = await fetch(`${API_URL}/api/auth/register`, {
           method: 'POST',
           headers,
           body: JSON.stringify({
@@ -169,7 +169,7 @@ export const useAuthStore = create<AuthState>()(
         headers.append('Content-Type', 'application/json');
         headers.append('Authorization', `Bearer ${token}`);
 
-        const response = await fetch(`${API_URL}/api/users/profile`, {
+        const response = await fetch(`${API_URL}/api/auth/profile`, {
           method: 'PUT',
           headers,
           body: JSON.stringify(profileData),
@@ -199,7 +199,7 @@ export const useAuthStore = create<AuthState>()(
         headers.append('Authorization', `Bearer ${token}`);
 
         const userId = get().user?.id;
-        const response = await fetch(`${API_URL}/api/users/${userId}`, {
+        const response = await fetch(`${API_URL}/api/auth/${userId}`, {
           method: 'DELETE',
           headers,
         });
