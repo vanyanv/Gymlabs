@@ -2,9 +2,8 @@ export type User = {
   id: string;
   name?: string;
   email: string;
-  pasword: string;
+  password?: string;
 };
-
 export interface AuthState {
   user: User | null;
   loading: boolean;
@@ -16,7 +15,7 @@ export interface AuthState {
   signup: () => (
     email: string,
     password: string,
-    name?: string
+    name: string
   ) => Promise<User>;
   logout: () => Promise<void>;
 }

@@ -3,8 +3,10 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { User, AuthState } from './types';
 import tokenStorage from './tokenStorage';
-import * as authService from './authService'; // Import all exports from the new service
 import { QueryClient } from '@tanstack/react-query';
+
+// Define API base URL - adjust this to your actual API URL
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 // Define a queryClient for direct usage within the store
 const queryClient = new QueryClient();
@@ -46,16 +48,14 @@ export const useAuthStore = create<AuthState>()(
         try {
           const token = await tokenStorage.getToken();
           if (token) {
-            // Manually fetch user data
-            const response = await fetch(
-              'https://your-api-url.com/api/auth/me',
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  'Content-Type': 'application/json',
-                },
-              }
-            );
+            // Manually fetch user data using JWT token
+            // Note: You need to implement a /api/users/me endpoint in your backend
+            const response = await fetch(`${API_URL}/api/users/me`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+            });
 
             if (response.ok) {
               const userData = await response.json();
@@ -77,86 +77,78 @@ export const useAuthStore = create<AuthState>()(
       },
 
       login: () => async (email: string, password: string) => {
-        // Create a temporary mutation function similar to the one in authService
         const headers = new Headers();
         headers.append('Content-Type', 'application/json');
 
-        const response = await fetch(
-          'https://your-api-url.com/api/auth/login',
-          {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({ email, password }),
-          }
-        );
+        const response = await fetch(`${API_URL}/api/users/login`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ email, password }),
+        });
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || 'Login failed');
+          throw new Error(errorData.error || 'Login failed');
         }
 
         const data = await response.json();
         await tokenStorage.storeToken(data.token);
 
+        // Format the user data from backend response
+        const user = {
+          id: data.id,
+          name: data.name,
+          email: email, // Backend doesn't return email in response, so we use the one provided
+        };
+
         // Update store
-        set({ user: data.user, isAuthenticated: true });
+        set({ user, isAuthenticated: true });
 
         // Update React Query cache
-        queryClient.setQueryData(['user'], data.user);
+        queryClient.setQueryData(['user'], user);
 
-        return data.user;
+        return user;
       },
 
-      signup: () => async (email: string, password, name?: string) => {
-        // Create a temporary mutation function similar to the one in authService
+      signup: () => async (email: string, password: string, name: string) => {
         const headers = new Headers();
         headers.append('Content-Type', 'application/json');
 
-        const response = await fetch(
-          'https://your-api-url.com/api/auth/signup',
-          {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({
-              name,
-              email,
-              password,
-            }),
-          }
-        );
+        const response = await fetch(`${API_URL}/api/users/register`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            name,
+            email,
+            password,
+          }),
+        });
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || 'Signup failed');
+          throw new Error(errorData.error || 'Signup failed');
         }
 
         const data = await response.json();
         await tokenStorage.storeToken(data.token);
 
+        // Format the user data from backend response
+        const user = {
+          id: data.id,
+          name: data.name,
+          email: email, // Backend doesn't return email in response, so we use the one provided
+        };
+
         // Update store
-        set({ user: data.user, isAuthenticated: true });
+        set({ user, isAuthenticated: true });
 
         // Update React Query cache
-        queryClient.setQueryData(['user'], data.user);
+        queryClient.setQueryData(['user'], user);
 
-        return data.user;
+        return user;
       },
 
       logout: async () => {
-        try {
-          // Try to call the server to invalidate the token
-          await fetch('https://your-api-url.com/api/auth/logout', {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${await tokenStorage.getToken()}`,
-              'Content-Type': 'application/json',
-            },
-          });
-        } catch (error) {
-          // Continue with logout even if server call fails
-          console.error('Logout server call failed:', error);
-        }
-
         // Clear token
         await tokenStorage.removeToken();
 
@@ -168,7 +160,7 @@ export const useAuthStore = create<AuthState>()(
         queryClient.removeQueries({ queryKey: ['user'] });
       },
 
-      // Optional: Add methods to work with the useUpdateProfile hook
+      // Update profile method (you'll need to implement this endpoint in your backend)
       updateProfile: () => async (profileData: Partial<User>) => {
         const token = await tokenStorage.getToken();
         if (!token) throw new Error('Not authenticated');
@@ -177,14 +169,11 @@ export const useAuthStore = create<AuthState>()(
         headers.append('Content-Type', 'application/json');
         headers.append('Authorization', `Bearer ${token}`);
 
-        const response = await fetch(
-          'https://your-api-url.com/api/auth/profile',
-          {
-            method: 'PUT',
-            headers,
-            body: JSON.stringify(profileData),
-          }
-        );
+        const response = await fetch(`${API_URL}/api/users/profile`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify(profileData),
+        });
 
         if (!response.ok) {
           throw new Error('Failed to update profile');
@@ -199,6 +188,34 @@ export const useAuthStore = create<AuthState>()(
         queryClient.setQueryData(['user'], updatedUser);
 
         return updatedUser;
+      },
+
+      // Add a delete user method to match your backend functionality
+      deleteAccount: async () => {
+        const token = await tokenStorage.getToken();
+        if (!token) throw new Error('Not authenticated');
+
+        const headers = new Headers();
+        headers.append('Authorization', `Bearer ${token}`);
+
+        const userId = get().user?.id;
+        const response = await fetch(`${API_URL}/api/users/${userId}`, {
+          method: 'DELETE',
+          headers,
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Failed to delete account');
+        }
+
+        // Clear token and user data after successful deletion
+        await tokenStorage.removeToken();
+        set({ user: null, isAuthenticated: false });
+
+        // Invalidate React Query cache
+        queryClient.invalidateQueries({ queryKey: ['user'] });
+        queryClient.removeQueries({ queryKey: ['user'] });
       },
     }),
     {
@@ -215,7 +232,7 @@ export const initializeAuth = async (): Promise<void> => {
   await bootstrap();
 };
 
-// Create a provider component to initialize auth and provide the QueryClient
+// Create a provider component to initialize auth
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
