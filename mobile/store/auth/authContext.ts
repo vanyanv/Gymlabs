@@ -66,6 +66,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       login: () => async (email: string, password: string) => {
+        set({ loading: true });
         const headers = new Headers();
         headers.append('Content-Type', 'application/json');
 
@@ -95,7 +96,7 @@ export const useAuthStore = create<AuthState>()(
 
         // Update React Query cache
         queryClient.setQueryData(['user'], user);
-
+        set({ loading: false });
         return user;
       },
 
@@ -210,7 +211,10 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'auth-storage',
       storage: createJSONStorage(() => secureStorageAdapter),
-      partialize: (state) => ({ user: state.user }), // Only persist the user
+      partialize: (state) => ({
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+      }),
     }
   )
 );

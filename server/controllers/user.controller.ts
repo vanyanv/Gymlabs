@@ -149,7 +149,7 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
 
     res.status(200).json(user);
   } catch (error) {
-    console.log('Error in Get Me Controller', error);
+    console.log('Error in Get Me Controller:', error);
     res.status(500).json({ error: 'Server Error' });
   }
 };
