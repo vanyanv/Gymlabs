@@ -6,33 +6,22 @@ import tokenStorage from './tokenStorage';
 import { QueryClient } from '@tanstack/react-query';
 
 // Define API base URL - adjust this to your actual API URL
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3009';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3009';
 
 // Define a queryClient for direct usage within the store
 const queryClient = new QueryClient();
 
 // Custom secure storage implementation
-const secureStorage = {
+// Adapter for Zustand persistence middleware to use tokenStorage
+const secureStorageAdapter = {
   getItem: async (name: string): Promise<string | null> => {
-    try {
-      return await tokenStorage.getToken();
-    } catch (e) {
-      return null;
-    }
+    return await tokenStorage.getToken();
   },
   setItem: async (name: string, value: string): Promise<void> => {
-    try {
-      await tokenStorage.storeToken(value);
-    } catch (e) {
-      console.error('Error storing in secure storage:', e);
-    }
+    await tokenStorage.storeToken(value);
   },
   removeItem: async (name: string): Promise<void> => {
-    try {
-      await tokenStorage.removeToken();
-    } catch (e) {
-      console.error('Error removing from secure storage:', e);
-    }
+    await tokenStorage.removeToken();
   },
 };
 
@@ -49,7 +38,7 @@ export const useAuthStore = create<AuthState>()(
           const token = await tokenStorage.getToken();
           if (token) {
             // Manually fetch user data using JWT token
-            // Note: You need to implement a /api/users/me endpoint in your backend
+
             const response = await fetch(`${API_URL}/api/auth/me`, {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -220,7 +209,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      storage: createJSONStorage(() => secureStorage),
+      storage: createJSONStorage(() => secureStorageAdapter),
       partialize: (state) => ({ user: state.user }), // Only persist the user
     }
   )
