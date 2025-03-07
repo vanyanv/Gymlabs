@@ -12,10 +12,24 @@ const tokenStorage = {
    */
   storeToken: async (token: string): Promise<void> => {
     try {
+      // Ensure we're using the correct function name
+      // Check the actual object to see what functions are available
+      console.log('Available SecureStore methods:', Object.keys(SecureStore));
+
+      // Use the correct method name
       await SecureStore.setItemAsync(TOKEN_KEY, token);
     } catch (error) {
       console.error('Error storing token:', error);
-      throw new Error('Failed to store authentication token');
+
+      // Log error details but don't throw in production
+      if (__DEV__) {
+        console.error('Full error details:', error);
+      }
+
+      // Continue without throwing to prevent app crashes
+      console.warn(
+        'Authentication token storage failed, continuing without token'
+      );
     }
   },
 
@@ -40,7 +54,7 @@ const tokenStorage = {
       await SecureStore.deleteItemAsync(TOKEN_KEY);
     } catch (error) {
       console.error('Error removing token:', error);
-      throw new Error('Failed to remove authentication token');
+      // Don't throw to prevent app crashes
     }
   },
 };

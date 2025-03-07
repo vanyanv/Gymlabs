@@ -5,6 +5,7 @@ import { Text } from '@/components/ui/text';
 import { Button, ButtonText } from '@/components/ui/button';
 import { Center } from '@/components/ui/center';
 import { VStack } from '@/components/ui/vstack';
+import LoginScreen from './screens/LoginScreen';
 
 export default function Home() {
   return (
@@ -49,6 +50,10 @@ export default function Home() {
           </Text>
         </Center>
       </ScrollView>
+
+      <Box>
+        <LoginScreen />
+      </Box>
     </Box>
   );
 }
