@@ -128,6 +128,32 @@ export const deleteUser = async (
   }
 };
 
+//when user refreshes app and returns we restore their authetication state using this call
+export const getMe = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // req.user is set by the protect middleware
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        // Don't include password in the response
+      },
+    });
+
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.log('Error in Get Me Controller:', error);
+    res.status(500).json({ error: 'Server Error' });
+  }
+};
+
 // Generate JWT
 const generateToken = (id: string) => {
   return jwt.sign({ id }, JWT_SECRET, {

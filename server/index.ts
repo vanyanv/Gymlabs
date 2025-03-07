@@ -10,7 +10,6 @@ import wgerApiService from './services/wgerApiService';
 dotenv.config();
 
 const app: Express = express();
-const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
@@ -24,7 +23,7 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 // Routes
-app.use('/api/users', userRoutes);
+app.use('/api/auth', userRoutes);
 app.use('/api/exerciseNames', exerciseNames);
 app.use('/api/workouts', workoutsRoutes);
 

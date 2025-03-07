@@ -1,8 +1,8 @@
 // routes/users.routes.ts
 import { Router, Request, Response } from 'express';
-import prisma from '../lib/prisma';
+
 import { protect } from '../middleware/auth';
-import { loginUser, registerUser } from '../controllers/user.controller';
+import { getMe, loginUser, registerUser } from '../controllers/user.controller';
 
 const router = Router();
 
@@ -12,6 +12,8 @@ router.post('/login', loginUser);
 //protected route to check for JWT
 router.use(protect);
 
+//Way to restore auth state when user return or refreshes app
+router.get('/me', getMe);
 // Add implementation for protected routes
 router.post('/', async (req: Request, res: Response): Promise<void> => {
   // Your implementation here
