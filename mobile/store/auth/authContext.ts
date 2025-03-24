@@ -32,6 +32,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       loading: true,
       isAuthenticated: false,
+      token: null, // Added missing token property
 
       bootstrap: async () => {
         try {
@@ -48,7 +49,7 @@ export const useAuthStore = create<AuthState>()(
 
             if (response.ok) {
               const userData = await response.json();
-              set({ user: userData, isAuthenticated: true });
+              set({ user: userData, isAuthenticated: true, token: token }); // Updated to include token
 
               // Update the React Query cache with the user data
               queryClient.setQueryData(['user'], userData);
@@ -92,7 +93,7 @@ export const useAuthStore = create<AuthState>()(
         };
 
         // Update store
-        set({ user, isAuthenticated: true });
+        set({ user, isAuthenticated: true, token: data.token }); // Updated to include token
 
         // Update React Query cache
         queryClient.setQueryData(['user'], user);
@@ -130,7 +131,7 @@ export const useAuthStore = create<AuthState>()(
         };
 
         // Update store
-        set({ user, isAuthenticated: true });
+        set({ user, isAuthenticated: true, token: data.token }); // Updated to include token
 
         // Update React Query cache
         queryClient.setQueryData(['user'], user);
@@ -143,7 +144,7 @@ export const useAuthStore = create<AuthState>()(
         await tokenStorage.removeToken();
 
         // Update store
-        set({ user: null, isAuthenticated: false });
+        set({ user: null, isAuthenticated: false, token: null }); // Updated to include token
 
         // Invalidate React Query cache
         queryClient.invalidateQueries({ queryKey: ['user'] });
@@ -172,7 +173,7 @@ export const useAuthStore = create<AuthState>()(
         const updatedUser = await response.json();
 
         // Update store
-        set({ user: updatedUser });
+        set({ user: updatedUser, token: token }); // Updated to include token
 
         // Update React Query cache
         queryClient.setQueryData(['user'], updatedUser);
@@ -201,7 +202,7 @@ export const useAuthStore = create<AuthState>()(
 
         // Clear token and user data after successful deletion
         await tokenStorage.removeToken();
-        set({ user: null, isAuthenticated: false });
+        set({ user: null, isAuthenticated: false, token: null }); // Updated to include token
 
         // Invalidate React Query cache
         queryClient.invalidateQueries({ queryKey: ['user'] });

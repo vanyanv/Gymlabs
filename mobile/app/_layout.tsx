@@ -12,7 +12,8 @@ import { useColorScheme } from '@/components/useColorScheme';
 import { Slot } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/store/auth/authContext';
-
+import { useAuthStore } from '@/store/auth/authContext';
+import { Spinner } from '@/components/ui/spinner';
 import '../global.css';
 
 export {

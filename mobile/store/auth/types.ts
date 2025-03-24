@@ -7,6 +7,7 @@ export type User = {
 export interface AuthState {
   user: User | null;
   loading: boolean;
+  token: string | null;
   isAuthenticated: boolean;
 
   //actions

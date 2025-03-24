@@ -5,9 +5,17 @@ import { Text } from '@/components/ui/text';
 import { Button, ButtonText } from '@/components/ui/button';
 import { Center } from '@/components/ui/center';
 import { VStack } from '@/components/ui/vstack';
-import LoginScreen from './screens/LoginScreen';
+import { useAuthStore } from '@/store/auth/authContext';
+import { Link, Redirect } from 'expo-router';
 
 export default function Home() {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const loading = useAuthStore((state) => state.loading);
+
+  if (isAuthenticated) {
+    return <Redirect href='/dashboard' />;
+  }
+
   return (
     <Box className='flex-1 bg-black min-h-screen'>
       <ScrollView
@@ -32,16 +40,19 @@ export default function Home() {
 
           {/* Auth Buttons */}
           <VStack className='space-y-4 w-full mt-12'>
-            <Button className='bg-white rounded-xl py-4'>
-              <ButtonText className='text-black font-semibold text-lg'>
-                Login
-              </ButtonText>
-            </Button>
-            <Button className='bg-blue-600 rounded-xl py-4'>
-              <ButtonText className='text-white font-semibold text-lg'>
-                Sign Up
-              </ButtonText>
-            </Button>
+            <Link
+              href='/(auth)/login'
+              className='w-full text-center text-gray-800 font-semibold text-lg bg-white hover:bg-gray-100 rounded-xl py-3 px-6 shadow-md transition duration-300 border border-gray-200'
+            >
+              Login
+            </Link>
+
+            <Link
+              href='/(auth)/register'
+              className='w-full text-center text-white font-semibold text-lg bg-indigo-600 hover:bg-indigo-700 rounded-xl py-3 px-6 shadow-md transition duration-300'
+            >
+              Sign Up
+            </Link>
           </VStack>
 
           {/* Optional: Terms text */}
@@ -50,10 +61,6 @@ export default function Home() {
           </Text>
         </Center>
       </ScrollView>
-
-      <Box>
-        <LoginScreen />
-      </Box>
     </Box>
   );
 }
