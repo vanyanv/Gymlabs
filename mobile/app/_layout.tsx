@@ -12,6 +12,7 @@ import { useColorScheme } from '@/components/useColorScheme';
 import { Slot } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ClerkProvider } from '@clerk/clerk-expo';
+import { tokenCache } from '@clerk/clerk-expo/token-cache';
 
 import '../global.css';
 
@@ -38,6 +39,7 @@ const queryClient = new QueryClient({
   },
 });
 
+//Key for Clerk Provider
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
 if (!publishableKey) {
@@ -80,7 +82,7 @@ function RootLayoutNav() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ClerkProvider publishableKey={publishableKey}>
+      <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
         <GluestackUIProvider mode={colorScheme === 'dark' ? 'dark' : 'light'}>
           <ThemeProvider
             value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
