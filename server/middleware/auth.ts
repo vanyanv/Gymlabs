@@ -11,7 +11,7 @@ declare global {
   }
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'; // Use environment variable in production
+const JWT_SECRET = process.env.JWT_SECRET || 'auth_token'; // Use environment variable in production
 
 export const protect: RequestHandler = async (
   req: Request,
@@ -19,9 +19,12 @@ export const protect: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
+    // In your auth middleware
+    console.log('Auth header received:', req.header('Authorization'));
+
     // Get token from header
     const token = req.header('Authorization')?.replace('Bearer ', '');
-
+    console.log('Extracted token:', token);
     if (!token) {
       res.status(401).json({ error: 'Not authorized, no token' });
       return;
